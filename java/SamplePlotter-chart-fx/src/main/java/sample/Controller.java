@@ -6,6 +6,7 @@ import de.gsi.chart.plugins.Zoomer;
 import de.gsi.chart.renderer.datareduction.RamanDouglasPeukerDataReducer;
 import de.gsi.chart.renderer.spi.ErrorDataSetRenderer;
 import de.gsi.chart.renderer.spi.ReducingLineRenderer;
+import de.gsi.dataset.DataSet2D;
 import de.gsi.dataset.spi.DoubleDataSet;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.URL;
+import java.util.Random;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -42,9 +44,7 @@ public class Controller implements Initializable {
         final DoubleDataSet dataSet2 = new DoubleDataSet("data set #2");
         lineChart.getDatasets().addAll(dataSet1, dataSet2); // two data sets
 
-//        RamanDouglasPeukerDataReducer dataReducer = new RamanDouglasPeukerDataReducer();
         final ReducingLineRenderer dataRenderer = new ReducingLineRenderer();
-//        dataRenderer.rendererDataReducerProperty().setValue(dataReducer);
         lineChart.getRenderers().set(0, dataRenderer);
 
         final double[] xValues = new double[N_SAMPLES];
@@ -52,12 +52,10 @@ public class Controller implements Initializable {
         final double[] yValues2 = new double[N_SAMPLES];
         for (int n = 0; n < N_SAMPLES; n++) {
             xValues[n] = n;
-            yValues1[n] = Math.cos(Math.toRadians(10.0 * n));
-            yValues2[n] = Math.sin(Math.toRadians(10.0 * n));
         }
         LOGGER.debug("adding items to plot");
-        dataSet1.set(xValues, yValues1);
-//        dataSet2.set(xValues, yValues2);
+        dataSet1.set(xValues, Controller.generateData(1.0,0.1,N_SAMPLES));
+        dataSet2.set(xValues, Controller.generateData(1.0,0.1,N_SAMPLES));
         LOGGER.debug(String.format("finished adding %d items to plot",N_SAMPLES));
 
         plotPane.getChildren().add(lineChart);
@@ -69,5 +67,18 @@ public class Controller implements Initializable {
         AnchorPane.setBottomAnchor(lineChart, 0d);
         AnchorPane.setLeftAnchor(lineChart, 0d);
         AnchorPane.setRightAnchor(lineChart, 0d);
+    }
+
+    public static double[] generateData(double firstValue, double variance, int size) {
+        double []data = new double[size];
+        Random rnd = new Random();
+        data[0] = firstValue;
+
+        for (int x = 1; x < size; x++) {
+            int sign = rnd.nextBoolean() ? 1 : -1;
+            double y = data[x - 1] + variance * rnd.nextDouble() * sign;
+            data[x] = y;
+        }
+        return data;
     }
 }
