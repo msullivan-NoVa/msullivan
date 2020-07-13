@@ -42,7 +42,8 @@ public class Controller implements Initializable {
         lineChart.getPlugins().add(new Zoomer());
         final DoubleDataSet dataSet1 = new DoubleDataSet("data set #1");
         final DoubleDataSet dataSet2 = new DoubleDataSet("data set #2");
-        lineChart.getDatasets().addAll(dataSet1, dataSet2); // two data sets
+        final DoubleDataSet dataSet3 = new DoubleDataSet("data set #3");
+        lineChart.getDatasets().addAll(dataSet1, dataSet2, dataSet3); // two data sets
 
         final ReducingLineRenderer dataRenderer = new ReducingLineRenderer();
         lineChart.getRenderers().set(0, dataRenderer);
@@ -50,12 +51,14 @@ public class Controller implements Initializable {
         final double[] xValues = new double[N_SAMPLES];
         final double[] yValues1 = new double[N_SAMPLES];
         final double[] yValues2 = new double[N_SAMPLES];
+        final double[] yValues3 = new double[N_SAMPLES];
         for (int n = 0; n < N_SAMPLES; n++) {
             xValues[n] = n;
         }
         LOGGER.debug("adding items to plot");
         dataSet1.set(xValues, Controller.generateData(1.0,0.1,N_SAMPLES));
         dataSet2.set(xValues, Controller.generateData(1.0,0.1,N_SAMPLES));
+        dataSet3.set(xValues, Controller.generateData(1.0,0.1,N_SAMPLES));
         LOGGER.debug(String.format("finished adding %d items to plot",N_SAMPLES));
 
         plotPane.getChildren().add(lineChart);

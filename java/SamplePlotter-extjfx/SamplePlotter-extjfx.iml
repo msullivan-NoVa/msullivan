@@ -29,7 +29,7 @@
     <orderEntry type="library" name="Maven: org.openjfx:javafx-swing:win:13.0.1" level="project" />
     <orderEntry type="library" name="Maven: cern.extjfx:extjfx-samples:0.0.2" level="project" />
     <orderEntry type="library" name="Maven: cern.extjfx:extjfx-chart:0.0.2" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.logging.log4j:log4j-api:2.13.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.logging.log4j:log4j-core:2.13.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.logging.log4j:log4j-api:2.13.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.logging.log4j:log4j-core:2.13.2" level="project" />
   </component>
 </module>

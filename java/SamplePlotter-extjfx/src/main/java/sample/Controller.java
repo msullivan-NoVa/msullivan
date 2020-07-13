@@ -32,7 +32,7 @@ public class Controller implements Initializable {
 
     protected static final Logger LOGGER = LogManager.getLogger(Controller.class);
     private static final int ONE_MILLION = 1000*1000;
-    private static final int N_SAMPLES = ONE_MILLION*10; // 8GB memory
+    private static final int N_SAMPLES = ONE_MILLION*1; // 8GB memory
 
     @FXML
     private Pane plotPane;
@@ -51,19 +51,9 @@ public class Controller implements Initializable {
         lineChart.setTitle("Test data");
         lineChart.setStyle(".chart-series-line { -fx-stroke-width: 1px; }");
 
-        final DataReducingObservableList<Number, Number> reducedData = new DataReducingObservableList<>(xAxis);
-        reducedData.setDataReducer(new LinearDataReducer<>());
-        reducedData.setMaxPointsCount(1000);
-        lineChart.getData().add(new XYChart.Series<>("Random data", reducedData));
-
-        final ObservableList<XYChart.Data<Number, Number>> sourceData = FXCollections.observableArrayList();
-
-        Controller.generateData(100, .1, N_SAMPLES).forEach(item -> {
-            sourceData.add(new XYChart.Data<Number, Number>(item.getXValue().longValue(), item.getYValue().doubleValue()));
-        });
-        LOGGER.debug("adding items to plot");
-        reducedData.setData(new ListData<Number, Number>(sourceData));
-        LOGGER.debug(String.format("finished adding %d items to plot",sourceData.size()));
+        addRandomDataSeries(lineChart, xAxis,"series 1");
+        addRandomDataSeries(lineChart, xAxis,"series 2");
+        addRandomDataSeries(lineChart, xAxis,"series 3");
 
         plotPane.getChildren().add(chartPane);
         lineChart.setPrefWidth(800.0);
@@ -74,6 +64,21 @@ public class Controller implements Initializable {
         AnchorPane.setBottomAnchor(lineChart, 0d);
         AnchorPane.setLeftAnchor(lineChart, 0d);
         AnchorPane.setRightAnchor(lineChart, 0d);
+    }
+
+    private void addRandomDataSeries(LineChart<Number, Number> lineChart, NumericAxis xAxis, String seriesName) {
+        final DataReducingObservableList<Number, Number> reducedData = new DataReducingObservableList<>(xAxis);
+        reducedData.setDataReducer(new LinearDataReducer<>());
+        reducedData.setMaxPointsCount(1000);
+        lineChart.getData().add(new XYChart.Series<>(seriesName, reducedData));
+
+        final ObservableList<XYChart.Data<Number, Number>> sourceData = FXCollections.observableArrayList();
+        Controller.generateData(100, .1, N_SAMPLES).forEach(item -> {
+            sourceData.add(new XYChart.Data<Number, Number>(item.getXValue().longValue(), item.getYValue().doubleValue()));
+        });
+        LOGGER.debug("adding items to plot");
+        reducedData.setData(new ListData<Number, Number>(sourceData));
+        LOGGER.debug(String.format("finished adding %d items to plot",sourceData.size()));
     }
 
     public static ObservableList<XYChart.Data<Number, Number>> generateData(double firstValue, double variance, int size) {
