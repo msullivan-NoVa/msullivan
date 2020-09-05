@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<Configuration status="DEBUG">
+    <Appenders>
+        <File name="file" fileName="app.log">
+            <PatternLayout>
+                <Pattern>%d %p %c{1.} [%t] %m %ex%n</Pattern>
+            </PatternLayout>
+        </File>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%m%n"/>
+        </Console>
+        <Console name="LogToConsole" target="SYSTEM_OUT">
+            <PatternLayout pattern="%m%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Logger name="com.sullivan.mrs" level="debug" additivity="false">
+            <AppenderRef ref="LogToConsole"/>
+        </Logger>
+        <Root level="trace">
+            <AppenderRef ref="file" level="DEBUG"/>
+            <AppenderRef ref="STDOUT" level="INFO"/>
+            <AppenderRef ref="LogToConsole" level="DEBUG"/>
+        </Root>
+    </Loggers>
+</Configuration>

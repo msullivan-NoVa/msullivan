@@ -7,27 +7,45 @@ import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.time.StopWatch;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.apache.parquet.avro.AvroParquetWriter;
-import org.apache.parquet.avro.AvroSchemaConverter;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
-import org.apache.parquet.schema.MessageType;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.Timer;
 
 public class Main {
 
-    public static void main(String[] args) {
-        String sourceFile = "C:\\data\\test_data_FourDays_10hz.csv";
+    protected static final Logger LOGGER = LogManager.getLogger(Main.class);
 
-        try (Reader reader = Files.newBufferedReader(Paths.get(sourceFile))) {
+    private static final String CSV_INPUT_FILE = "C:\\Users\\mathe\\data\\test_data_FourDays_10hz.csv";
+    private static final String PARQUET_OUTPUT_FILE = "C:\\Users\\mathe\\data\\test_data_FourDays_10hz_JAVA.parquet";
+
+    public static void main(String[] args) {
+
+        if (Files.exists(Paths.get(PARQUET_OUTPUT_FILE))) {
+            try {
+                Files.delete(Paths.get(PARQUET_OUTPUT_FILE));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        long startTime = System.currentTimeMillis();
+        LOGGER.debug("reading CSV");
+        System.out.println("reading CSV");
+        try (Reader reader = Files.newBufferedReader(Paths.get(CSV_INPUT_FILE))) {
             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader());
             List<String> headerNames = csvParser.getHeaderNames();
 
@@ -35,8 +53,8 @@ public class Main {
             recordBuilder.namespace("com.sullivan.mrs");
             SchemaBuilder.FieldAssembler fieldAssembler = recordBuilder.fields();
             fieldAssembler.name("time").type(LogicalTypes.timestampMillis().addToSchema(Schema.create(Schema.Type.LONG))).noDefault();
-            for (int i=1;i<headerNames.size();i++) {
-                fieldAssembler.name(String.format("sensor_%d",i)).type().nullable().doubleType().noDefault();
+            for (int i = 1; i < headerNames.size(); i++) {
+                fieldAssembler.name(String.format("sensor_%d", i)).type().nullable().doubleType().noDefault();
             }
             Schema avroSchema = (Schema) fieldAssembler.endRecord();
 
@@ -49,23 +67,24 @@ public class Main {
             //conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName()); // Not needed unless you reference the hadoop-hdfs library.
             //conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName()); // Uncomment if you get "No FileSystem for scheme: file" errors
 
-            Path filePath = new Path("C:\\data\\test_data_FourDays_10hz_.parquet");
+            Path filePath = new Path(PARQUET_OUTPUT_FILE);
             int blockSize = 1024;
             int pageSize = 65535;
             try (
-                ParquetWriter<GenericData.Record> parquetWriter = AvroParquetWriter.
-                        <GenericData.Record>builder(filePath)
-                        .withSchema(avroSchema)
-                        .withCompressionCodec(CompressionCodecName.SNAPPY)
-                        .withPageSize(pageSize)
-                        .build();) {
+                    ParquetWriter<GenericData.Record> parquetWriter = AvroParquetWriter.
+                            <GenericData.Record>builder(filePath)
+                            .withSchema(avroSchema)
+                            .withCompressionCodec(CompressionCodecName.SNAPPY)
+//                        .withConf(conf)
+                            .withPageSize(pageSize)
+                            .build();) {
 
-                csvParser.getRecords().stream().forEach(obj-> {
+                csvParser.getRecords().stream().forEach(obj -> {
                     GenericData.Record record = new GenericData.Record(avroSchema);
                     SensorRecords sensorData = new SensorRecords(obj);
                     record.put(0, sensorData.getTime());
-                    for (int i=1;i<headerNames.size();i++) {
-                        record.put(i, sensorData.getSensor(i-1));
+                    for (int i = 1; i < headerNames.size(); i++) {
+                        record.put(i, sensorData.getSensor(i - 1));
                     }
                     try {
                         parquetWriter.write(record);
@@ -82,6 +101,10 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        long endTime = System.currentTimeMillis();
+        long elapsed = (endTime - startTime) / (1000);
+        System.out.println("wrote Parquet " + elapsed);
+        LOGGER.debug("wrote Parquet");
     }
 
     static class SensorRecords {

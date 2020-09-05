@@ -32,7 +32,7 @@ public class Controller implements Initializable {
 
     protected static final Logger LOGGER = LogManager.getLogger(Controller.class);
     private static final int ONE_MILLION = 1000*1000;
-    private static final int N_SAMPLES = ONE_MILLION*1; // 8GB memory
+    private static final int N_SAMPLES = ONE_MILLION*2; // 8GB memory
 
     @FXML
     private Pane plotPane;
@@ -53,7 +53,7 @@ public class Controller implements Initializable {
 
         addRandomDataSeries(lineChart, xAxis,"series 1");
         addRandomDataSeries(lineChart, xAxis,"series 2");
-        addRandomDataSeries(lineChart, xAxis,"series 3");
+//        addRandomDataSeries(lineChart, xAxis,"series 3");
 
         plotPane.getChildren().add(chartPane);
         lineChart.setPrefWidth(800.0);

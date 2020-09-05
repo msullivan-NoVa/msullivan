@@ -29,8 +29,9 @@ public class Controller implements Initializable {
 
     protected static final Logger LOGGER = LogManager.getLogger(Controller.class);
     private static final int ONE_MILLION = 1000*1000;
-    private static final int N_SAMPLES = ONE_MILLION*10; // 8GB memory <1 GB for chart-fx
-
+    private static final int N_SAMPLES = ONE_MILLION*80; // 8GB memory <1 GB for chart-fx
+ // 40 million 3.2 GB
+ // 80 million 6.4 GB
     @FXML
     private Pane plotPane;
 
@@ -42,23 +43,20 @@ public class Controller implements Initializable {
         lineChart.getPlugins().add(new Zoomer());
         final DoubleDataSet dataSet1 = new DoubleDataSet("data set #1");
         final DoubleDataSet dataSet2 = new DoubleDataSet("data set #2");
-        final DoubleDataSet dataSet3 = new DoubleDataSet("data set #3");
-        lineChart.getDatasets().addAll(dataSet1, dataSet2, dataSet3); // two data sets
+//        final DoubleDataSet dataSet3 = new DoubleDataSet("data set #3");
+        lineChart.getDatasets().addAll(dataSet1, dataSet2);//, dataSet3); // two data sets
 
         final ReducingLineRenderer dataRenderer = new ReducingLineRenderer();
         lineChart.getRenderers().set(0, dataRenderer);
 
         final double[] xValues = new double[N_SAMPLES];
-        final double[] yValues1 = new double[N_SAMPLES];
-        final double[] yValues2 = new double[N_SAMPLES];
-        final double[] yValues3 = new double[N_SAMPLES];
         for (int n = 0; n < N_SAMPLES; n++) {
             xValues[n] = n;
         }
         LOGGER.debug("adding items to plot");
         dataSet1.set(xValues, Controller.generateData(1.0,0.1,N_SAMPLES));
         dataSet2.set(xValues, Controller.generateData(1.0,0.1,N_SAMPLES));
-        dataSet3.set(xValues, Controller.generateData(1.0,0.1,N_SAMPLES));
+//        dataSet3.set(xValues, Controller.generateData(1.0,0.1,N_SAMPLES));
         LOGGER.debug(String.format("finished adding %d items to plot",N_SAMPLES));
 
         plotPane.getChildren().add(lineChart);
