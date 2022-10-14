@@ -1,0 +1,15 @@
+FROM node:18.7.0
+
+# RUN addgroup app && adduser --ingroup app app
+# RUN mkdir /app && chown app:app /app
+# USER app
+RUN mkdir /app
+
+WORKDIR /app
+COPY package.json .
+RUN npm install
+RUN npm i --save react-select
+
+COPY . .
+
+CMD ["npm","run", "start"]
